@@ -40,6 +40,6 @@ Start the server
 Test it from the command line
 
 ```bash
-  curl "127.0.0.1:8080/hello?msg=World"
+  curl -XGET "127.0.0.1:8080/posts/list"
 ```
 
