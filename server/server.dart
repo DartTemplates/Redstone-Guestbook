@@ -47,7 +47,8 @@ class Post {
   final String collectionName = "posts";
 
   @app.Route('/list')
-  list(@app.Attr() Db conn) {
+//  list(@app.Attr() Db conn) {
+  list(@app.Inject() Db conn) {
     logger.info("Guestbook : list posts");
 
     var coll = conn.collection(collectionName);
@@ -62,7 +63,8 @@ class Post {
   }
 
   @app.Route('/add', methods: const [app.POST])
-  add(@app.Attr() Db conn, @app.Body(app.JSON) Map post) {
+//  add(@app.Attr() Db conn, @app.Body(app.JSON) Map post) {
+  add(@app.Inject() Db conn, @app.Body(app.JSON) Map post) {
     logger.info("Guestbook : add post");
 
     var coll = conn.collection(collectionName);
@@ -77,7 +79,8 @@ class Post {
   }
   
   @app.Route('/delete', methods: const [app.DELETE])
-  delete(@app.Attr() Db conn) {
+//  delete(@app.Attr() Db conn) {
+    delete(@app.Inject() Db conn) {
     logger.info("Guestbook : delete post");
 
     var coll = conn.collection(collectionName);
@@ -106,7 +109,7 @@ void main() {
   
   // Inject database connection pool
   app.addModule(new Module()
-      ..bind(MongoDbPool, toValue: new MongoDbPool(appDB, poolSize)));
+    ..bind(MongoDbPool, toValue: new MongoDbPool(appDB, poolSize)));
 
   // Setup server log
   app.setupConsoleLog();
