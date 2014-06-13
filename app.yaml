@@ -1,0 +1,13 @@
+name: Redstone-Guestbook
+framework: redstone
+
+handlers:
+# Backend service
+- url: /posts
+  script: server.dart
+
+# Static content served by Nginx 
+- url: /
+  match: postregex
+  static_dir: web
+
