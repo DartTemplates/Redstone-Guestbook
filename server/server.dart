@@ -95,7 +95,7 @@ class Post {
 void main() {
   // Server port assignment
   var PORT = Platform.environment['PORT'];
-  var appPort = PORT != null ? PORT : 8080;
+  var appPort = PORT != null ? int.parse(PORT) : 8080;
   
   // Database endpoint assignment
   var MONGODB_URI = Platform.environment['MONGODB_URI'];  
