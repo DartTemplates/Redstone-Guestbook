@@ -28,7 +28,8 @@ class MongoDbPool extends ConnectionPool<Db> {
   }
 }
 
-@app.Interceptor(r'/services/.+')
+/// Init database connection
+@app.Interceptor(r'/.*')
 dbInterceptor(MongoDbPool pool) {
   pool.getConnection().then((managedConnection) {
     app.request.attributes["conn"] = managedConnection.conn;
@@ -45,10 +46,9 @@ dbInterceptor(MongoDbPool pool) {
 @app.Group("/posts")
 class Post {
   final String collectionName = "posts";
-
+  
   @app.Route('/list')
-//  list(@app.Attr() Db conn) {
-  list(@app.Inject() Db conn) {
+  list(@app.Attr() Db conn) {
     logger.info("Guestbook : list posts");
 
     var coll = conn.collection(collectionName);
@@ -63,8 +63,7 @@ class Post {
   }
 
   @app.Route('/add', methods: const [app.POST])
-//  add(@app.Attr() Db conn, @app.Body(app.JSON) Map post) {
-  add(@app.Inject() Db conn, @app.Body(app.JSON) Map post) {
+  add(@app.Attr() Db conn, @app.Body(app.JSON) Map post) {
     logger.info("Guestbook : add post");
 
     var coll = conn.collection(collectionName);
@@ -79,8 +78,7 @@ class Post {
   }
   
   @app.Route('/delete', methods: const [app.DELETE])
-//  delete(@app.Attr() Db conn) {
-    delete(@app.Inject() Db conn) {
+  delete(@app.Attr() Db conn) {
     logger.info("Guestbook : delete post");
 
     var coll = conn.collection(collectionName);
