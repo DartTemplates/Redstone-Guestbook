@@ -28,7 +28,8 @@ class MongoDbPool extends ConnectionPool<Db> {
   }
 }
 
-@app.Interceptor(r'/services/.+')
+/// Init database connection
+@app.Interceptor(r'/.*')
 dbInterceptor(MongoDbPool pool) {
   pool.getConnection().then((managedConnection) {
     app.request.attributes["conn"] = managedConnection.conn;
@@ -45,7 +46,7 @@ dbInterceptor(MongoDbPool pool) {
 @app.Group("/posts")
 class Post {
   final String collectionName = "posts";
-
+  
   @app.Route('/list')
   list(@app.Attr() Db conn) {
     logger.info("Guestbook : list posts");
@@ -106,7 +107,7 @@ void main() {
   
   // Inject database connection pool
   app.addModule(new Module()
-      ..bind(MongoDbPool, toValue: new MongoDbPool(appDB, poolSize)));
+    ..bind(MongoDbPool, toValue: new MongoDbPool(appDB, poolSize)));
 
   // Setup server log
   app.setupConsoleLog();
