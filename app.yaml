@@ -1,5 +1,4 @@
 name: Redstone-Guestbook
-framework: redstone
 
 # Backend service
 server:
