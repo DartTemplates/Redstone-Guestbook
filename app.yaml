@@ -5,7 +5,7 @@ server:
 - url: /posts
   script: server.dart
 
-# Static content served by Nginx 
+# Static content served by Nginx
 client:
 - url: /
   match: postregex
