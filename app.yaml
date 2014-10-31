@@ -10,5 +10,5 @@ server:
 client:
 - url: /
   match: postregex
-  static_dir: web
+  dir: web
 
