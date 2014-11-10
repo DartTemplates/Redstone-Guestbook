@@ -6,6 +6,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:connection_pool/connection_pool.dart';
 import 'package:di/di.dart';
 import 'package:logging/logging.dart';
+import 'package:shelf/shelf.dart' as shelf;
 
 // Setup application log
 var logger = new Logger("guestbook");
@@ -28,6 +29,25 @@ class MongoDbPool extends ConnectionPool<Db> {
   }
 }
 
+// Support for CORS
+@app.Interceptor(r'/.*')
+handleResponseHeader() {
+  if (app.request.method == "OPTIONS") {
+   // Overwrite the current response and interrupt the chain.
+   app.response = new shelf.Response.ok(null, headers: _createCorsHeader());
+   app.chain.interrupt();
+  } else {
+   // Process the chain and wrap the response
+   app.chain.next(() => app.response.change(headers: _createCorsHeader()));
+  }
+}
+
+_createCorsHeader() =>  {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-type",
+  "Access-Control-Allow-Methods": "OPTIONS, HEAD, GET, POST, PUT, DELETE"
+};
+
 /// Init database connection
 @app.Interceptor(r'/.*')
 dbInterceptor(MongoDbPool pool) {
@@ -46,7 +66,7 @@ dbInterceptor(MongoDbPool pool) {
 @app.Group("/posts")
 class Post {
   final String collectionName = "posts";
-  
+
   @app.Route('/list')
   list(@app.Attr() Db conn) {
     logger.info("Guestbook : list posts");
@@ -76,7 +96,7 @@ class Post {
       return "Unable to save post";
     });
   }
-  
+
   @app.Route('/delete', methods: const [app.DELETE])
   delete(@app.Attr() Db conn) {
     logger.info("Guestbook : delete post");
@@ -96,22 +116,22 @@ class Post {
 void main() {
   // Server port assignment
   var PORT = Platform.environment['PORT'];
-  var appPort = PORT != null ? int.parse(PORT) : 8080;
-  
+  var appPort = PORT != null ? int.parse(PORT) : 9090;
+
   // Database endpoint assignment
-  var MONGODB_URI = Platform.environment['MONGODB_URI'];  
-  var appDB = MONGODB_URI != null ? MONGODB_URI : "mongodb://localhost/guestbook"; 
-    
+  var MONGODB_URI = Platform.environment['MONGODB_URI'];
+  var appDB = MONGODB_URI != null ? MONGODB_URI : "mongodb://localhost/guestbook";
+
   // Set connection pool size
   var poolSize = 3;
-  
+
   // Inject database connection pool
   app.addModule(new Module()
     ..bind(MongoDbPool, toValue: new MongoDbPool(appDB, poolSize)));
 
   // Setup server log
   app.setupConsoleLog();
-  
+
   // Start server
   app.start(address: '127.0.0.1', port: appPort);
 }
