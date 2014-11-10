@@ -37,9 +37,10 @@ Start the server
   dart server/server.dart
 ```
 
-Test it from the command line
+Start the client with pub serve or from the DartEditor
 
 ```bash
-  curl -XGET "127.0.0.1:8080/posts/list"
+  cd client
+  pub serve
 ```
 
