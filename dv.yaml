@@ -1,6 +1,6 @@
 server:
 - url: /posts
-  script: server.dart
+  match: regex
 
 client:
 - url: /
